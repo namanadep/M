@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🐱 Case File #1012</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Caveat:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f1117;
+      color: #e8e0d4;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0f1117; }
+    ::-webkit-scrollbar-thumb { background: #c0392b; border-radius: 3px; }
+
+    /* ── Utility ── */
+    .typewriter { font-family: 'Special Elite', monospace; }
+    .handwritten { font-family: 'Caveat', cursive; }
+    section { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1.25rem; position: relative; }
+
+    /* ── Particles (paw prints floating) ── */
+    .paw-particle {
+      position: fixed; pointer-events: none; opacity: 0; z-index: 0;
+      font-size: 1rem; animation: floatUp 6s linear infinite;
+    }
+    @keyframes floatUp {
+      0%   { opacity: 0; transform: translateY(100vh) rotate(0deg); }
+      10%  { opacity: .15; }
+      90%  { opacity: .15; }
+      100% { opacity: 0; transform: translateY(-10vh) rotate(360deg); }
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 1 — OPENING
+    ══════════════════════════════════════ */
+    #opening {
+      background: radial-gradient(ellipse at 50% 80%, #1a1510 0%, #0f1117 70%);
+      text-align: center; gap: 1.5rem;
+    }
+    #opening .badge {
+      display: inline-block; border: 2px solid #c0392b; padding: .35rem 1rem;
+      font-size: .7rem; letter-spacing: 3px; text-transform: uppercase;
+      color: #c0392b; border-radius: 4px; animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: .6; } 50% { opacity: 1; } }
+
+    #opening h1 {
+      font-family: 'Special Elite', monospace; font-size: clamp(1.4rem, 5vw, 2.6rem);
+      line-height: 1.4; color: #f5e6c8; max-width: 600px;
+    }
+    #opening h1 .redact { color: #c0392b; }
+    .typed-cursor { animation: blink .7s step-end infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .detective-cat {
+      font-size: 4rem; animation: peek 2s ease-out forwards;
+      transform: translateY(60px); opacity: 0;
+    }
+    @keyframes peek { to { transform: translateY(0); opacity: 1; } }
+
+    .scroll-hint {
+      position: absolute; bottom: 2rem; font-size: .75rem; color: #665e52;
+      letter-spacing: 2px; text-transform: uppercase; animation: fadeInUp 2s 3s forwards; opacity: 0;
+    }
+    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+    .scroll-hint span { display: block; animation: bounce 1.5s infinite; }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+
+    /* ══════════════════════════════════════
+       SECTION 2 — EVIDENCE BOARD
+    ══════════════════════════════════════ */
+    #evidence {
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 29px, #2a231a11 30px),
+        #15120e;
+      padding-top: 4rem;
+    }
+    #evidence h2 {
+      font-family: 'Special Elite', monospace; font-size: clamp(1.2rem, 4vw, 1.8rem);
+      color: #c0392b; margin-bottom: .5rem;
+    }
+    #evidence .subtitle {
+      font-family: 'Caveat', cursive; font-size: 1.1rem; color: #8a7e6e; margin-bottom: 2rem;
+    }
+
+    .evidence-grid {
+      display: grid; grid-template-columns: 1fr; gap: 1.25rem;
+      max-width: 500px; width: 100%;
+    }
+    @media (min-width: 520px) { .evidence-grid { grid-template-columns: 1fr 1fr; max-width: 680px; } }
+
+    .evidence-card {
+      perspective: 800px; cursor: pointer; height: 220px;
+    }
+    .evidence-card-inner {
+      position: relative; width: 100%; height: 100%;
+      transition: transform .6s cubic-bezier(.4,.0,.2,1);
+      transform-style: preserve-3d;
+    }
+    .evidence-card.flipped .evidence-card-inner { transform: rotateY(180deg); }
+
+    .evidence-front, .evidence-back {
+      position: absolute; inset: 0; border-radius: 10px; padding: 1.25rem;
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+    }
+    .evidence-front {
+      background: linear-gradient(135deg, #1e1b16, #2a2520);
+      border: 1.5px solid #3a332a;
+      box-shadow: 0 4px 20px #00000040;
+    }
+    .evidence-front .stamp {
+      font-family: 'Special Elite', monospace; font-size: .65rem;
+      color: #c0392b; letter-spacing: 2px; text-transform: uppercase;
+      border: 1px solid #c0392b; padding: .15rem .6rem; border-radius: 3px;
+      margin-bottom: .75rem; transform: rotate(-3deg);
+    }
+    .evidence-front .label {
+      font-family: 'Special Elite', monospace; font-size: 1rem; color: #d4c8b0;
+    }
+    .evidence-front .tap-hint {
+      font-size: .65rem; color: #5a5245; margin-top: auto;
+      font-family: 'Caveat', cursive;
+    }
+
+    .evidence-back {
+      background: linear-gradient(135deg, #faf3e8, #f0e6d3);
+      transform: rotateY(180deg); color: #2a2217; gap: .5rem;
+    }
+    .evidence-back .cat-emoji { font-size: 2.5rem; }
+    .evidence-back .finding {
+      font-family: 'Caveat', cursive; font-size: 1.15rem; color: #3a2f20; line-height: 1.4;
+    }
+    .evidence-back .red-note {
+      font-family: 'Special Elite', monospace; font-size: .7rem;
+      color: #c0392b; transform: rotate(-2deg);
+    }
+
+    /* Red strings (decorative) */
+    .red-string {
+      position: absolute; width: 2px; background: #c0392b55; z-index: 0;
+      display: none;
+    }
+    @media (min-width: 520px) { .red-string { display: block; } }
+
+    /* ══════════════════════════════════════
+       SECTION 3 — SUSPECT PROFILE
+    ══════════════════════════════════════ */
+    #suspect {
+      background: linear-gradient(180deg, #15120e, #111318, #15120e);
+    }
+    .suspect-file {
+      background: #1c1915; border: 1.5px solid #33291f; border-radius: 12px;
+      max-width: 400px; width: 100%; overflow: hidden;
+      box-shadow: 0 8px 40px #00000060;
+    }
+    .suspect-header {
+      background: #c0392b; padding: .6rem 1rem;
+      font-family: 'Special Elite', monospace; font-size: .75rem;
+      letter-spacing: 3px; text-transform: uppercase; color: #fff; text-align: center;
+    }
+    .suspect-body { padding: 1.5rem; }
+    .photo-frame {
+      width: 150px; height: 180px; margin: 0 auto 1.25rem;
+      border: 3px solid #3a332a; border-radius: 6px; overflow: hidden;
+      position: relative; background: #0f0d0a;
+    }
+    .photo-frame img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .photo-placeholder {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 3rem; color: #3a332a;
+    }
+    .photo-placeholder small {
+      font-size: .55rem; color: #5a5245; margin-top: .5rem;
+      font-family: 'Special Elite', monospace; letter-spacing: 1px;
+    }
+    .suspect-details { list-style: none; }
+    .suspect-details li {
+      padding: .5rem 0; border-bottom: 1px solid #2a231a33;
+      display: flex; gap: .5rem; font-size: .85rem;
+    }
+    .suspect-details li:last-child { border-bottom: none; }
+    .suspect-details .key {
+      font-family: 'Special Elite', monospace; color: #8a7e6e;
+      min-width: 90px; font-size: .75rem; text-transform: uppercase; letter-spacing: 1px;
+      padding-top: 2px;
+    }
+    .suspect-details .val { color: #e8e0d4; font-family: 'Caveat', cursive; font-size: 1.1rem; }
+    .suspect-details .val.red { color: #c0392b; }
+
+    .crown-badge {
+      display: block; text-align: center; margin-top: 1rem;
+      font-family: 'Caveat', cursive; font-size: 1.3rem; color: #f5c842;
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 4 — WITNESS TESTIMONIALS
+    ══════════════════════════════════════ */
+    #witnesses {
+      background: radial-gradient(ellipse at 50% 0%, #1a1510, #0f1117 60%);
+      gap: 2rem; padding-top: 4rem;
+    }
+    #witnesses h2 {
+      font-family: 'Special Elite', monospace; font-size: clamp(1.2rem, 4vw, 1.8rem);
+      color: #c0392b; margin-bottom: .25rem;
+    }
+    #witnesses .subtitle {
+      font-family: 'Caveat', cursive; font-size: 1.1rem; color: #8a7e6e; margin-bottom: 1rem;
+    }
+
+    .testimonials {
+      display: flex; flex-direction: column; gap: 1.25rem;
+      max-width: 480px; width: 100%;
+    }
+    .testimonial {
+      background: #1a1815; border-left: 3px solid #c0392b;
+      padding: 1.25rem; border-radius: 0 10px 10px 0;
+      opacity: 0; transform: translateX(-20px);
+      transition: all .6s ease-out;
+    }
+    .testimonial.visible { opacity: 1; transform: translateX(0); }
+    .testimonial .witness-name {
+      font-family: 'Special Elite', monospace; font-size: .75rem;
+      color: #c0392b; letter-spacing: 1px; margin-bottom: .4rem;
+      display: flex; align-items: center; gap: .4rem;
+    }
+    .testimonial .witness-cat { font-size: 1.2rem; }
+    .testimonial .quote {
+      font-family: 'Caveat', cursive; font-size: 1.15rem; color: #d4c8b0;
+      line-height: 1.5; font-style: italic;
+    }
+    .testimonial .quote::before { content: '\201C'; color: #c0392b; font-size: 1.5rem; }
+    .testimonial .quote::after { content: '\201D'; color: #c0392b; font-size: 1.5rem; }
+
+    /* ══════════════════════════════════════
+       SECTION 5 — CASE CLOSED
+    ══════════════════════════════════════ */
+    #verdict {
+      background: radial-gradient(ellipse at 50% 50%, #1e1510, #0f1117 70%);
+      text-align: center; gap: 1.5rem;
+    }
+    .case-stamp {
+      font-family: 'Special Elite', monospace; font-size: clamp(2rem, 8vw, 4rem);
+      color: #c0392b; transform: rotate(-6deg);
+      border: 4px solid #c0392b; padding: .3rem 1.5rem; border-radius: 8px;
+      text-transform: uppercase; letter-spacing: 4px;
+      opacity: 0; animation: slamIn .5s ease-out forwards;
+      animation-play-state: paused;
+    }
+    .case-stamp.animate { animation-play-state: running; }
+    @keyframes slamIn {
+      0% { transform: rotate(-6deg) scale(3); opacity: 0; }
+      60% { transform: rotate(-6deg) scale(.95); opacity: 1; }
+      100% { transform: rotate(-6deg) scale(1); opacity: 1; }
+    }
+    .verdict-text {
+      max-width: 480px; font-family: 'Caveat', cursive; font-size: 1.35rem;
+      color: #d4c8b0; line-height: 1.6;
+    }
+    .verdict-text .name { color: #f5c842; font-weight: 700; font-size: 1.5rem; }
+
+    .birthday-msg {
+      margin-top: 1rem; padding: 1.5rem; background: #1a181522;
+      border: 1px solid #33291f; border-radius: 12px; max-width: 420px;
+    }
+    .birthday-msg p {
+      font-family: 'Caveat', cursive; font-size: 1.4rem; color: #f5e6c8; line-height: 1.6;
+    }
+    .birthday-cats { font-size: 2.5rem; margin-top: 1rem; letter-spacing: .5rem; }
+
+    /* ── Confetti Canvas ── */
+    #confetti-canvas {
+      position: fixed; inset: 0; pointer-events: none; z-index: 200;
+    }
+
+    /* ── Reveal animations ── */
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: all .8s cubic-bezier(.4,.0,.2,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── Mobile-first spacing ── */
+    @media (max-width: 400px) {
+      section { padding: 1.5rem 1rem; }
+      .suspect-body { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+
+  <!-- Floating paw particles -->
+  <div id="particles" aria-hidden="true"></div>
+
+  <!-- ════ SECTION 1: OPENING ════ -->
+  <section id="opening">
+    <div class="badge">Classified — Case #1012</div>
+    <div class="detective-cat" aria-hidden="true">🔍🐱</div>
+    <h1 id="typewriter-target"></h1>
+    <div class="scroll-hint">
+      <span>↓ scroll to investigate ↓</span>
+    </div>
+  </section>
+
+  <!-- ════ SECTION 2: EVIDENCE BOARD ════ -->
+  <section id="evidence">
+    <h2 class="reveal">📌 Evidence Board</h2>
+    <p class="subtitle reveal">tap each file to reveal the findings</p>
+    <div class="evidence-grid">
+
+      <div class="evidence-card reveal" onclick="this.classList.toggle('flipped')">
+        <div class="evidence-card-inner">
+          <div class="evidence-front">
+            <div class="stamp">Exhibit A</div>
+            <div class="label">Suspicious Hobby</div>
+            <div class="tap-hint">tap to reveal 👆</div>
+          </div>
+          <div class="evidence-back">
+            <div class="cat-emoji">🐱🎧</div>
+            <div class="finding">Knows more about murder mysteries than most detectives 🔪</div>
+            <div class="red-note">— threat level: adorable</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="evidence-card reveal" onclick="this.classList.toggle('flipped')">
+        <div class="evidence-card-inner">
+          <div class="evidence-front">
+            <div class="stamp">Exhibit B</div>
+            <div class="label">Known Superpower</div>
+            <div class="tap-hint">tap to reveal 👆</div>
+          </div>
+          <div class="evidence-back">
+            <div class="cat-emoji">🐱✨</div>
+            <div class="finding">Can light up any room just by walking in. Witness(me) reports involuntary smiling in her presence. No known cure.</div>
+            <div class="red-note">— highly contagious</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="evidence-card reveal" onclick="this.classList.toggle('flipped')">
+        <div class="evidence-card-inner">
+          <div class="evidence-front">
+            <div class="stamp">Exhibit C</div>
+            <div class="label">Cat Magnet Effect</div>
+            <div class="tap-hint">tap to reveal 👆</div>
+          </div>
+          <div class="evidence-back">
+            <div class="cat-emoji">🐱🐱🐱</div>
+            <div class="finding">Every cat within a 10m radius in Kachrali lake is drawn to her. Scientists are baffled. Cats are not, they know PEAK when they see it 😼</div>
+            <div class="red-note">— phenomenon: unexplained</div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="evidence-card reveal" onclick="this.classList.toggle('flipped')">
+        <div class="evidence-card-inner">
+          <div class="evidence-front">
+            <div class="stamp">Exhibit F</div>
+            <div class="label">The Birthday Anomaly</div>
+            <div class="tap-hint">tap to reveal 👆</div>
+          </div>
+          <div class="evidence-back">
+            <div class="cat-emoji">🐱🎂</div>
+            <div class="finding">Born on April 10th. Coincidence? No. The universe simply knew the world needed her. Today the sun shines a little brighter because of her.</div>
+            <div class="red-note">— case: cosmically significant</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════ SECTION 3: SUSPECT PROFILE ════ -->
+  <section id="suspect">
+    <div class="suspect-file reveal">
+      <div class="suspect-header">Suspect Profile — Confidential</div>
+      <div class="suspect-body">
+        <div class="photo-frame">
+          <img src="goldi.jpg" alt="Goldi" />
+        </div>
+        <ul class="suspect-details">
+          <li>
+            <span class="key">Name</span>
+            <span class="val">Goldi</span>
+          </li>
+          <li>
+            <span class="key">Aliases</span>
+            <span class="val">Serial cuta, Cat Whisperer</span>
+          </li>
+          <li>
+            <span class="key">D.O.B</span>
+            <span class="val">April 10</span>
+          </li>
+          <li>
+            <span class="key">Status</span>
+            <span class="val red">Armed &amp; Dangerous (with cuteness)</span>
+          </li>
+          <li>
+            <span class="key">Last Seen</span>
+            <span class="val">looking angelic</span>
+          </li>
+          <li>
+            <span class="key">Associates</span>
+            <span class="val">Cats. Many, many cats.</span>
+          </li>
+          <li>
+            <span class="key">Hobbies</span>
+            <span class="val">Solving true crimes before the podcast host does</span>
+          </li>
+        </ul>
+        <span class="crown-badge">👑 Certified Cat Charmer 👑</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ SECTION 4: WITNESS TESTIMONIALS ════ -->
+  <section id="witnesses">
+    <h2 class="reveal">🐾 Witness Statements</h2>
+    <p class="subtitle reveal">collected from agents in the field</p>
+    <div class="testimonials">
+
+      <div class="testimonial">
+        <div class="witness-name"><span class="witness-cat">🕵️‍♂️🐱</span> Detective Whiskers</div>
+        <div class="quote">In all my nine lives on the force, I have NEVER encountered anyone this amazing. Goldi broke the scale. I'm retiring.</div>
+      </div>
+
+      <div class="testimonial">
+        <div class="witness-name"><span class="witness-cat">🔬🐱</span> Forensic Analyst Mr. Fluffington</div>
+        <div class="quote">Lab results are in. DNA analysis confirms she's 100% that girl. We ran the test three times. Same result every time.</div>
+      </div>
+
+      <div class="testimonial">
+        <div class="witness-name"><span class="witness-cat">🎙️🐱</span> Podcast Host Meowdelyn</div>
+        <div class="quote">This week on Purrder Mystery... we investigate who gave Goldi the RIGHT to be this talented. Spoiler: she was born with it.</div>
+      </div>
+
+      <div class="testimonial">
+        <div class="witness-name"><span class="witness-cat">☕🐱</span> Informant Sergeant Nonu Beans</div>
+        <div class="quote">Word on the street is that every cat in town wanted to wish her happy birthday. I'm just the one brave enough to say it first.</div>
+      </div>
+
+      <div class="testimonial">
+        <div class="witness-name"><span class="witness-cat">📋🐱</span> Chief Inspector Pawsworth</div>
+        <div class="quote">After reviewing all the evidence... I'm closing the case. Not because we solved it, but because some people are just too purrfect to explain.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════ SECTION 5: CASE CLOSED ════ -->
+  <section id="verdict">
+    <div class="case-stamp" id="caseStamp">Case Closed</div>
+    <div class="verdict-text reveal">
+      After an exhaustive investigation, the evidence is overwhelming and indisputable.<br /><br />
+      <span class="name">Goldi</span> is officially the most amazing, kind, funny, and beautiful person to have ever graced this planet.<br /><br />
+      The cats have spoken. The case is closed.
+    </div>
+    <div class="birthday-msg reveal">
+      <p>
+        Happy Birthday, Goldi. 💛<br /><br />
+        Here's to another year of being unapologetically you.<br /><br />
+      </p>
+    </div>
+    <div class="birthday-cats reveal">🐱🎂🐱</div>
+  </section>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <script>
+    /* ── Typewriter Effect ── */
+    (function typewriter() {
+      const el = document.getElementById('typewriter-target');
+      const html = 'On <span class="redact">April 10th</span>, a suspicious individual was reported&hellip; someone <span class="redact">TOO amazing</span> to be real.';
+      const plainParts = html.split(/(<[^>]+>)/);
+      let i = 0, charIdx = 0, built = '', inTag = false;
+      const raw = plainParts.join('');
+
+      function tick() {
+        if (i >= raw.length) { el.innerHTML = html; return; }
+        const char = raw[i];
+        if (char === '<') { inTag = true; }
+        if (inTag) {
+          built += char;
+          if (char === '>') inTag = false;
+          i++;
+          tick();
+          return;
+        }
+        built += char;
+        i++;
+        el.innerHTML = built + '<span class="typed-cursor">|</span>';
+        setTimeout(tick, 35 + Math.random() * 30);
+      }
+      setTimeout(tick, 1200);
+    })();
+
+    /* ── Paw Particles ── */
+    (function particles() {
+      const container = document.getElementById('particles');
+      const paws = ['🐾', '🐾', '🐾'];
+      for (let i = 0; i < 10; i++) {
+        const el = document.createElement('span');
+        el.className = 'paw-particle';
+        el.textContent = paws[Math.floor(Math.random() * paws.length)];
+        el.style.left = Math.random() * 100 + '%';
+        el.style.animationDelay = Math.random() * 6 + 's';
+        el.style.animationDuration = (5 + Math.random() * 4) + 's';
+        container.appendChild(el);
+      }
+    })();
+
+
+    /* ── Scroll Reveal ── */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          // Trigger case stamp
+          if (e.target.id === 'caseStamp') e.target.classList.add('animate');
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal, .testimonial, #caseStamp').forEach(el => observer.observe(el));
+
+    /* ── Confetti on Verdict ── */
+    (function confetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [], fired = false;
+
+      function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      window.addEventListener('resize', resize);
+      resize();
+
+      const colors = ['#c0392b', '#f5c842', '#e8e0d4', '#f39c12', '#e74c3c', '#ffeaa7'];
+      const emojis = ['🐾', '🐱', '✨', '🎂', '💛', '👑'];
+
+      function spawn() {
+        for (let i = 0; i < 120; i++) {
+          particles.push({
+            x: Math.random() * canvas.width,
+            y: -20 - Math.random() * 200,
+            w: 6 + Math.random() * 6,
+            h: 4 + Math.random() * 8,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            emoji: Math.random() > 0.7 ? emojis[Math.floor(Math.random() * emojis.length)] : null,
+            vx: (Math.random() - 0.5) * 4,
+            vy: 2 + Math.random() * 4,
+            rot: Math.random() * 360,
+            vr: (Math.random() - 0.5) * 8,
+            life: 1,
+          });
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.04;
+          p.rot += p.vr;
+          p.life -= 0.003;
+          if (p.life <= 0) return;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot * Math.PI / 180);
+          ctx.globalAlpha = p.life;
+          if (p.emoji) {
+            ctx.font = '16px serif';
+            ctx.fillText(p.emoji, 0, 0);
+          } else {
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          }
+          ctx.restore();
+        });
+        particles = particles.filter(p => p.life > 0);
+        if (particles.length) requestAnimationFrame(draw);
+      }
+
+      const verdictObs = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !fired) {
+          fired = true;
+          spawn();
+          requestAnimationFrame(draw);
+          // Second burst
+          setTimeout(() => { spawn(); requestAnimationFrame(draw); }, 800);
+        }
+      }, { threshold: 0.3 });
+      verdictObs.observe(document.getElementById('verdict'));
+    })();
+  </script>
+</body>
+</html>
